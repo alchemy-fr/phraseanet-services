@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>[QParser] ${COMPOSE_PROJECT_NAME}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <link href="./jquery.splitter.css" rel="stylesheet">
+
+    <meta name="theme-color" content="#563d7c">
+    <link rel="stylesheet" href="parser4.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        h1 {
+            padding: 5px;
+        }
+
+        .splitter_panel .vsplitter {
+            background-color: lightgrey;
+            width: 3px;
+            color: black;
+            font-size: 5px;
+            writing-mode: tb;
+            text-align: center;
+            overflow: hidden;
+            line-height: 1;
+        }
+
+        .splitter_panel .vsplitter::before {
+            content: '\25CF\25CF\25CF\25CF\25CF';
+            position: relative;
+            left: 1px;
+        }
+
+
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .services {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 30px;
+            grid-auto-rows: minmax(100px, auto);
+        }
+
+        .services > li {
+            border-radius: 15px;
+            border: 1px solid #DDD;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0, .1);
+        }
+
+        .services > li > img {
+            display: inline-block;
+            max-width: 50px;
+        }
+
+        .other-svc {
+            margin-top: 30px;
+        }
+
+        .other-svc > li {
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            background-color: #f5f5f5;
+        }
+
+        .env h3 {
+            margin-top: 30px;
+        }
+
+        .env pre {
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #CCC;
+            background: #f5f5f5;
+        }
+    </style>
+
+    <script type="module">
+        import {Parser} from './parser4.js';
+
+        let parser = new Parser;
+
+        $("#QUERY").keyup(
+            function() {
+                const _$in = $("#QUERY");
+                const debug = $("#CK_DEBUG").is(':checked');
+
+                parser.setDebug(debug).parse(_$in.val(), _$in.selectionStart, _$in.selectionEnd);
+
+                const ast = parser.getAST();
+
+                $("#ERROR").html(ast.error);
+                $("#DUMP_TOKENS").html(parser.dumpTokens());
+                $("#DUMP_JSON").html(JSON.stringify(ast, null, 2));
+                $("#DUMP_TREE").html(parser.dumpAST());
+
+                $(window).resize();
+            }
+        );
+    </script>
+
+    <script type="text/javascript">
+        const examples = [
+            { h: "text" },
+
+            {t: "chien", h: ""},
+            {t: "poisson chat", h: ""},
+            {t: "marchAND OReille ANDouille", h: ""},
+            {t: "orange (couleur)", h: "\"contexte\" à implémenter ?"},
+            {t: "(chat) chien", h: "concat"},
+
+            { h: "escape char (anti-slash)" },
+
+            {t: "\\\" ; \\( ; \\= ; \\and ...", h: ""},
+
+            { h: "operators and parenthesis" },
+
+            {t: "chien et chat", h: ""},
+            {t: "chien and chat", h: ""},
+            {t: "chien et chat sauf oiseau", h: ""},
+            {t: "(chien et chat) sauf oiseau", h: ""},
+            {t: "chien et (chat sauf oiseau)", h: ""},
+            {t: "chat dans titre", h: ""},
+
+            { h: "quoting" },
+
+            {t: "en or massif", h: "attention au \"or\" !"},
+            {t: "\"en or massif\"", h: ""},
+            {t: "or massif", h: "!! erreur !!"},
+            {t: "\"or massif\"", h: ""},
+            {t: "lingot d'or pur", h: "le \"'\" (apostrophe) n'est pas dans la grammaire"},
+            {t: "r\"raw text\"", h: "on peut typer les quotes"},
+            {t: "z\"zorro\"", h: "!! type de quote inconnu !!"},
+            {t: "chien \"chat\"", h: "concat"},
+
+            { h: "auto close"},
+
+            {t: "(chien et (chat sauf oiseau", h: "parenthèses fermées automatiquement"},
+            {t: "\"(chien et chats", h: "quotes fermés automatiquement"},
+
+            { h: "priority (auto-parenthesis)"},
+
+            {t: "a and b or c", h: ""},
+            {t: "a and b > c", h: ""},
+            {t: "a and meta.b = c", h: ""},
+            {t: "meta.b = c and a", h: ""},
+
+            { h: "arithmetic" },
+
+            {t: "size+10", h: "sans espaces"},
+            {t: "size + 10", h: "avec espaces"},
+            {t: "x-y", h: ""},
+
+            { h: "numerical units" },
+
+            {t: "1 day", h: "done : parsed as \"delay\" type"},
+            {t: "10 days", h: ""},
+            {t: "1 hour", h: "todo: implement other units"},
+            {t: "10", h: "todo ? : move to \"integer\" type (wo/w unit) ?"},
+
+            { h: "comparators" },
+
+            {t: "size=1", h: ""},
+            {t: "size = 2", h: ""},
+            {t: "size > 3", h: ""},
+            {t: "size < 4", h: ""},
+            {t: "size >= 5", h: ""},
+            {t: "size <= 6", h: ""},
+            {t: "size != 7", h: ""},
+            {t: "keyword : chien errant", h: ""},
+            {t: "titre is chien", h: "même que ':' ou '=' ?"},
+            {t: "titre is not chat", h: "même que '!=' ?"},
+            {t: "author is empty", h: "'empty' est un mot-clé"},
+
+            { h: "prefix" },
+
+            {t: "meta.titre : chien", h: ""},
+            {t: "field.titre : chien", h: ""},
+            {t: "m.titre : chien", h: "le \".\" (point) n'est pas dans la grammaire"},
+
+            { h: "to be fixed... ?" },
+
+            {t: "a in x y", h: " x y : un nom de champ avec des espaces ?"},
+            {t: "a = b dans c", h: "?"},
+            {t: "a et b dans c", h: "?"},
+            {t: "x > y+1", h: "fix priority"},
+
+            { h: "to be implemented: identifiers ?" },
+
+            {t: "titre:bla bla", h: "ici \"titre\" serait un identifiant"},
+            {t: "ce vin titre 13°", h: "ici \"titre\" resterait du texte"},
+        ];
+    </script>
+
+</head>
+
+
+<body style="height: 100vh; overflow: hidden">
+       <h1 id="TITLE">
+            QParser test
+        </h1>
+        <div id="CONTENT" class="xsplitted" data-xsplitter='{"orientation":"vertical", "limit":10, "position":"75%"}' style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px; overflow: hidden">
+            <div>
+                <div id="FORM" style="padding: 5px;">
+                    <form onsubmit="return false;" style="margin:0px;">
+                        <label for="QUERY"></label>
+                        <input id="QUERY" style="position:relative; width:95%; left:5px; font-size: 18px;" type="text" placeholder="type query or click on a sample">
+                        <div style="text-align: right">
+                            <label for="CK_DEBUG">console trace </label><input id="CK_DEBUG" type="checkbox">
+                        </div>
+                    </form>
+                    <div id="ERROR" style="color:red"></div>
+                    <div id="DUMP_TOKENS"></div>
+                </div>
+                <div id="TREES" class="xsplitted" data-xsplitter='{"orientation":"vertical", "limit":50, "position":"50%"}' style="position:absolute; width: 100%; bottom: 0px; border-top: darkgray 1px solid;">
+                    <div id="DUMP_TREE" style="overflow: auto; height: 100%; padding-top:5px; text-align:center"></div>
+                    <div id="DUMP_JSON" style="overflow: auto; height: 100%; padding-top:5px;"></div>
+                </div>
+
+            </div>
+            <div id="EXAMPLES" style="white-space: nowrap; padding-left: 5px;"></div>
+        </div>
+
+</body>
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="./jquery.splitter.js"></script>
+<script>
+    $(function () {
+        $(window).resize();
+
+        $(".xsplitted").each(function() {
+            let o = $(this);
+            o.split(JSON.parse(o.attr('data-xsplitter')));
+        });
+    });
+
+    $(window).resize(
+        function() {
+            $("#CONTENT").css('top', $("#TITLE").outerHeight(true));
+            $("#TREES").css('top', $("#FORM").outerHeight(true));
+        }
+    );
+
+    function clickExample(e)
+    {
+        $("#QUERY").val(e.innerText).keyup();
+    }
+
+    // enforce placing divs
+    $(window).resize();
+
+    // fill examples
+    let s = "";
+    examples.forEach(function (ex) {
+        if(ex.t) {
+            s += "<a onclick='clickExample(this);return false;' href='#'>" + ex.t + "</a>";
+            if(ex.h) {
+                s += "&nbsp;&nbsp;(" + ex.h + ")";
+            }
+            s += "<br/>";
+        }
+        else {
+            s += "<div style='margin-top:6px; margin-bottom:2px; font-weight: bold;'>" + ex.h + "</div>";
+        }
+    });
+    $("#EXAMPLES").html(s);
+
+</script>
+</html>

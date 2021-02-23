@@ -1,0 +1,88 @@
+span {
+    display: inline-block;
+    vertical-align:baseline;
+    border: 2px solid #CCCCCC;
+    padding: 0px 2px 2px;
+    border-top: 0px solid #000000;
+    margin: 0px 2px 2px;
+}
+span.STRING {
+    border-color: tan;
+}
+span.LOGICAL {
+    background-color:deepskyblue;
+}
+span.CONCAT {
+    background-color: dodgerblue;
+    color:white;
+}
+span.COMPARE {
+    background-color: aquamarine;
+}
+span.ARITHMETIC {
+    background-color: mediumvioletred;
+    color:white;
+}
+span.SPACE {
+    background-color: lightpink;
+}
+span.UNARY {
+    background-color: yellowgreen;
+}
+span.SUB_CHAR {
+    background-color: yellow;
+}
+span.FAKE_SUB_CHAR {
+    color: darkgrey;
+}
+span.PREFIX {
+    background-color: blanchedalmond;
+}
+span.WORD {
+    background-color: tan;
+}
+span.KEYWORD {
+    background-color: olive;
+    color: white;
+}
+span.DELAY {
+    background-color: tomato;
+    color: white;
+}
+
+#DUMP_TOKENS {
+    font-family: monospace;
+    font-size: 16px;
+    padding:5px;
+}
+
+#DUMP_JSON {
+    white-space: pre;
+    font-family: monospace;
+}
+
+#DUMP_TREE {
+    font-family: monospace;
+    font-size: 20px;
+}
+
+#DUMP_TREE TABLE {
+    margin-left: auto;
+    margin-right: auto;
+    border: grey 1px solid;
+    border-collapse: collapse;
+}
+
+#DUMP_TREE TD {
+    font-family: monospace;
+    font-size: 18px;
+    text-align: center;
+    border: grey 1px solid;
+    padding: 5px;
+    white-space: nowrap;
+}
+
+#DUMP_TREE SUB {
+    font-size: 8px;
+}
+
