@@ -21,15 +21,14 @@ use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use App\Filter\PublicationFilter;
-use App\Controller\DownloadViaZippyAction;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * @ORM\Entity()
- * @ApiFilter(OrderFilter::class, properties={"title": "ASC", "createdAt": "DESC", "updatedAt": "DESC"}, arguments={"orderParameterName"="order"})
+ * @ApiFilter(OrderFilter::class, properties={"title": "ASC", "createdAt": "DESC", "updatedAt": "DESC", "position": "DESC"}, arguments={"orderParameterName"="order"})
  * @ApiFilter(PublicationFilter::class, properties={"flatten"})
  * @ApiResource(
- *     attributes={"order"={"title": "ASC"}},
+ *     attributes={"order"={"pinned": "DESC", "position": "DESC", "title": "ASC"}},
  *     normalizationContext=Publication::API_READ,
  *     itemOperations={
  *         "get"={
@@ -248,7 +247,7 @@ class Publication implements AclObjectInterface
      *      joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="child_id", referencedColumnName="id")}
      * )
-     * @ORM\OrderBy({"title"="ASC"})
+     * @ORM\OrderBy({"pinned"="DESC", "position"="DESC", "title"="ASC"})
      */
     private Collection $children;
 
@@ -304,6 +303,21 @@ class Publication implements AclObjectInterface
      * @ORM\Column(type="string", length=32, nullable=true)
      */
     private ?string $zippyHash = null;
+
+    /**
+     * @ApiProperty()
+     * @Groups({"publication:read", "publication:index"})
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private bool $pinned = false;
+
+    /**
+     * @Groups({"publication:admin:read"})
+     *
+     * @ORM\Column(type="integer")
+     */
+    private int $position = 0;
 
     public function __construct()
     {
@@ -793,5 +807,25 @@ class Publication implements AclObjectInterface
     public function __sleep()
     {
         return [];
+    }
+
+    public function getPosition(): int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): void
+    {
+        $this->position = $position;
+    }
+
+    public function isPinned(): bool
+    {
+        return $this->pinned;
+    }
+
+    public function setPinned(bool $pinned): void
+    {
+        $this->pinned = $pinned;
     }
 }

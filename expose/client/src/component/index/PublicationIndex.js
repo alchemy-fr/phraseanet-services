@@ -12,6 +12,7 @@ import {Logo} from "../Logo";
 
 const SORT_BY_DATE = 'date';
 const SORT_BY_NAME = 'name';
+const SORT_BY_POS = 'position';
 const orders = {
     [SORT_BY_DATE]: {
         label: `Last post added`,
@@ -21,12 +22,16 @@ const orders = {
         label: `Publication name`,
         query: `order[title]=asc`,
     },
+    [SORT_BY_POS]: {
+        label: `Editor's choice`,
+        query: `order[pinned]=desc&order[position]=desc`,
+    },
 }
 
 class PublicationIndex extends PureComponent {
     state = {
         data: null,
-        sortBy: SORT_BY_DATE,
+        sortBy: SORT_BY_POS,
     };
 
     componentDidMount() {

@@ -37,6 +37,8 @@ easy_admin:
           - { property: 'assets.count', label: Assets }
           - { property: enabled, type: boolean }
           - { property: securityMethod }
+          - { property: pinned }
+          - { property: position }
           - createdAt
       form:
         fields:
@@ -48,6 +50,8 @@ easy_admin:
           - { property: 'date', type: Alchemy\AdminBundle\Form\DateTimePickerType }
           - { property: 'config', type: App\Form\PublicationConfigType }
           - { property: 'ownerId' }
+          - { property: pinned }
+          - { property: position }
 
     Profile:
       class: App\Entity\PublicationProfile
