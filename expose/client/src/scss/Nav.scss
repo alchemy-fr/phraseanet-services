@@ -30,6 +30,11 @@ $defaultPadding: 10px;
 .nav-item {
   display: block;
   padding: $defaultPadding;
+  word-break: break-all;
+
+  &.has-children {
+    padding-right: 45px;
+  }
 
   &:hover {
     background-color: rgba(#000, 0.05);
