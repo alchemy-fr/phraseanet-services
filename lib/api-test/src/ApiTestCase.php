@@ -48,7 +48,7 @@ abstract class ApiTestCase extends WebTestCase
         return $response;
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
